@@ -22,11 +22,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = '2da^^io$qw(#4#_pla!qt9s@!_i8*-f0@skfl3-cvsh$(8kgw%'
-if not DEBUG:
-    SECRET_KEY = os.environ['SECRET_KEY']
-    import django_heroku  # 追加
-    django_heroku.settings(locals())  # 追加
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False # True
 
@@ -140,10 +135,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 LOGIN_REDIRECT_URL = '/'
 
-db_from_env = dj_database_url.config(conn_max_age=500)
+db_from_env = dj_database_url.config(conn_max_age=500, ssl_require=True)
 DATABASES['default'].update(db_from_env)
 
 try:
     from .local_settings import *
 except ImportError:
     pass
+if not DEBUG:
+    SECRET_KEY = os.environ['SECRET_KEY']
+    import django_heroku  # 追加
+    django_heroku.settings(locals())  # 追加
